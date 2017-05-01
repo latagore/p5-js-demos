@@ -1,0 +1,48 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Page Title</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1.0">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.8/p5.js"></script>
+		<script>
+			let y = 100;
+			let x = 100;
+			let i = 0;
+			
+			let phase = 0;
+			function stepSize() {
+				phase += 0.1;
+				return (Math.sin(phase) + 0.4) * 5;
+			}
+
+			function setup() {
+			  createCanvas(720, 400);  // Size must be the first statement
+			  stroke(255);     // Set line drawing color to white
+			  frameRate(60);
+			  background(0);
+			}
+			
+			function draw() { 
+			  let s = stepSize();
+			  i -= s;
+			  if (s < 0) {
+				  stroke(127);
+			  } else {
+				  stroke(255);
+			  }
+			  if (i < 0) { 
+				i = width + height; 
+			  	background(0);   // Set the background to black
+			  } 
+//			  line(0, i, i, 0);
+			  quad(0, i, 0, i + s, i + s, 0, i, 0);
+			}
+		</script>
+	</head>
+
+	<body>
+
+	</body>
+</html>
