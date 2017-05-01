@@ -1,0 +1,39 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Page Title</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1.0">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.8/p5.js"></script>
+		<script>
+			var y = 100;
+			var x = 100;
+
+			// The statements in the setup() function 
+			// execute once when the program begins
+			function setup() {
+			  createCanvas(720, 400);  // Size must be the first statement
+			  stroke(255);     // Set line drawing color to white
+			  frameRate(30);
+			}
+			// The statements in draw() are executed until the 
+			// program is stopped. Each statement is executed in 
+			// sequence and after the last line is read, the first 
+			// line is executed again.
+			function draw() { 
+			  y = y - 1;
+			  x--;
+			  if (x < 0) { 
+				x = width; 
+			  	background(0);   // Set the background to black
+			  } 
+			  line(x, 0, x, height);  
+			} 
+		</script>
+	</head>
+
+	<body>
+
+	</body>
+</html>
