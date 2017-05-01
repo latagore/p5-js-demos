@@ -10,23 +10,23 @@
 			var y = 100;
 			var x = 100;
 			var i = 0;
-			var stepSize = 5;
+			var stepSize = 10;
 
 			function setup() {
 			  createCanvas(720, 400);  // Size must be the first statement
 			  stroke(255);     // Set line drawing color to white
-			  frameRate(120);
+			  frameRate(60);
 			  background(0);
 			}
 			
 			function draw() { 
 			  i -= stepSize;
-			  if (i < 0) { 
+			  if (i < -30 * stepSize) { 
 				i = width + height; 
 			  	background(0);   // Set the background to black
 			  } 
 //			  line(0, i, i, 0);
-			  quad(0, i, 0, i + stepSize, i, 0, i + stepSize, 0);
+			  quad(0, i, 0, i + stepSize, i + stepSize, 0, i, 0);
 			}
 		</script>
 	</head>
