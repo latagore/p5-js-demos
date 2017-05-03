@@ -1,0 +1,63 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Page Title</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1.0">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.8/p5.js"></script>
+		<script>
+			let points;
+			let r = 0.7;
+			let H = 0.55; 
+			function setup() {
+				createCanvas(720, 400);  // Size must be the first statement
+				stroke(50,180, 50);     // Set line drawing color to white
+				fill(50,180, 50);
+				frameRate(2);
+				background(180, 200, 255);
+				points = [createVector(0, 0.5), createVector(1, 0.5)];
+			}
+			
+			function draw() { 
+				// for each pair of points
+				// find the midpoint and displace it by a random amount divided by a roughness factor H
+				let i = 0; // index of the first pair of points during the current iteration
+				let p1 = points[0];
+				let p2 = points[1];
+				
+
+				do {
+					let newPoint = p5.Vector.div(p5.Vector.add(p1, p2), 2); // new point is midpoint between p1 and p2. take the average of the two vectors
+					newPoint.y += (Math.random() - 0.5 ) * r; // displace the midpoint by a random amount
+					points.splice(i + 1, 0, newPoint); // insert midpoint
+					
+					
+					p1 = p2;
+					p2 = points[i+3];
+					i += 2;
+				} while (i+1 < points.length);
+				
+				r *= H; // reduce the roughness of new midpoints
+
+				// drawing
+				background(180, 200, 255);
+				for (let j = 0; j < points.length - 1; j++) {
+					p1 = points[j];
+					p2 = points[j+1];
+					quad(p1.x * width, height - p1.y * height,
+						 p1.x * width, height,
+						 p2.x * width, height,
+						 p2.x * width, height - p2.y * height);
+				}
+				console.log(r);
+				if (i > 1000) noLoop();
+			}
+			
+		</script>
+	</head>
+
+	<body>
+
+	</body>
+</html>
