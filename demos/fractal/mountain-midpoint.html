@@ -32,7 +32,6 @@
 					newPoint.y += (Math.random() - 0.5 ) * r; // displace the midpoint by a random amount
 					points.splice(i + 1, 0, newPoint); // insert midpoint
 					
-					
 					p1 = p2;
 					p2 = points[i+3];
 					i += 2;
@@ -50,7 +49,7 @@
 						 p2.x * width, height,
 						 p2.x * width, height - p2.y * height);
 				}
-				console.log(r);
+
 				if (i > 1000) noLoop();
 			}
 			
