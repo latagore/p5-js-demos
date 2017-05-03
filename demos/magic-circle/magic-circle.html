@@ -1,0 +1,75 @@
+<!doctype html>
+
+<html>
+	<head>
+		<title>Page Title</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="initial-scale=1.0">
+		<script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.5.8/p5.js"></script>
+		<script>
+			let objects = []; // objects to animate
+			let count = 0;
+			function setup() {
+				createCanvas(720, 400);
+				stroke(0);
+				noFill()
+				frameRate(60);
+				background(255);
+				
+				// add a circle to draw
+				objects.push({
+					type: "circle",
+					animations: [{
+						type: "endAngle", // animates the end angle of the arc
+						finalAngle: TWO_PI,
+						step: PI * 0.01
+					}],
+					x: width / 2,
+					y: height / 2,
+					radius: 200,
+					startAngle: 0,
+					endAngle: 0
+				})
+			}
+			
+			function draw() { 
+				background(255);
+				for (let i = 0; i < objects.length; i++) {
+					let o = objects[i];
+					
+					
+					if (o.type === "circle") {
+						// update circle properties
+						for (let j = 0; j < o.animations.length; j++) {
+							let anim = o.animations[j];
+							if (anim.type === "endAngle") {
+								o.endAngle += anim.step;
+								if (anim.step > 0    && o.endAngle > anim.finalAngle
+									|| anim.step < 0 && o.endAngle < anim.finalAngle) {
+									o.endAngle = anim.finalAngle;
+								}
+							}
+							
+						}
+						
+						// draw circle
+						console.log(o.startAngle, o.endAngle);
+						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
+						arc(o.x - 10, o.y - 10, o.radius, o.radius, 0, TWO_PI);
+					}
+					
+				}
+				
+				count++;
+				if (count > 200) {
+					noLoop();
+				}
+			}
+			
+		</script>
+	</head>
+
+	<body>
+
+	</body>
+</html>
