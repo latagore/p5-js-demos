@@ -68,20 +68,32 @@
 							first: innerPoint,
 							last: outerPoint,
 							delay: i / numLines * circleAppearDuration + animationStart,
-							duration: 200, // milliseconds,
+							duration: 1000, // milliseconds,
 							progress: 0
+						}, {
+							prop: "color",
+							first: color(0, 255 * i / numLines), // black, opacity matching first circle
+							last: color(0, 255), // black, full opacity
+							duration: (numLines - i - 1) / numLines * circleAppearDuration,
+							progress: 0,
+							delay: i / numLines * circleAppearDuration + animationStart
 						}],
 						p1: innerPoint,
 						p2: innerPoint,
 						radius: 200,
 						startAngle: 0,
-						endAngle: 0
+						endAngle: 0,
+						color: color(0, 0)
 					})
 				}
 			}
 			
 			function isVector(obj) {
 				return obj.hasOwnProperty("x") && obj.hasOwnProperty("y");
+			}
+			
+			function isColor(obj) {
+				return obj instanceof p5.Color;
 			}
 			
 			function draw() { 
@@ -102,9 +114,16 @@
 						let progressRatio = constrain((anim.progress - (anim.delay || 0)) / anim.duration, 0, 1);
 						
 						// update the actual property
+						if (anim.progress < anim.delay) {
+							// skip when the animation hasn't started
+							continue;
+						}
+						
 						if (isVector(o[anim.prop])) {
 							// is a vector, use vector lerp
 							o[anim.prop] = p5.Vector.lerp(anim.first, anim.last, progressRatio);	
+						} else if (isColor(o[anim.prop])) {
+							o[anim.prop] = lerpColor(anim.first, anim.last, progressRatio);	
 						} else {
 							// is scalar, use scalar lerp
 							o[anim.prop] = lerp(anim.first, anim.last, progressRatio);	
@@ -117,18 +136,18 @@
 				// drawing
 				for (let i = 0; i < objects.length; i++) {
 					let o = objects[i];
-					// draw circle
+					
+					stroke(o.color || color(0));
 					if (o.type === "circle") {
 						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
 					} else if (o.type === "line") {
 						line(o.p1.x, o.p1.y, o.p2.x, o.p2.y);
 					}
-					
 				}
 			  
 				// limit the amount of time the animation runs
 				count++;
-				if (count > 2000) {
+				if (count > 300) {
 					noLoop();
 				}
 			}
