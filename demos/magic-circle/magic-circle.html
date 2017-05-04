@@ -40,29 +40,32 @@
 				lastTime = time;
 				time = millis();
 				let diff = time - lastTime;
-				console.log(diff);
+				
+				// update properties
 				for (let i = 0; i < objects.length; i++) {
 					let o = objects[i];
-					
-					
-					if (o.type === "circle") {
-						// update circle properties
-						for (let j = 0; j < o.animations.length; j++) {
-							let anim = o.animations[j];
-							
-							anim.progress = min(anim.progress + diff, anim.duration);
-							console.log(anim.progress);
-							o[anim.prop] = lerp(anim.first, anim.last, anim.progress / anim.duration);
-							// TODO how to remove animations that are done?
-						}
-						
-						// draw circle
-						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
+					for (let j = 0; j < o.animations.length; j++) {
+						let anim = o.animations[j];
+
+						anim.progress = min(anim.progress + diff, anim.duration);
+						o[anim.prop] = lerp(anim.first, anim.last, anim.progress / anim.duration);
+						// TODO how to remove animations that are done?
 					}
 				}
 				
+				// drawing
+				for (let i = 0; i < objects.length; i++) {
+					let o = objects[i];
+					// draw circle
+					if (o.type === "circle") {
+						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);	
+					} else if (o.type === "line") {
+						line(o.p1.x, o.p1.y, o.p2.x, o2.p2.y);
+					}
+					
+				}
 			  
-			  // limit the amount of time the animation runs
+				// limit the amount of time the animation runs
 				count++;
 				if (count > 200) {
 					noLoop();
