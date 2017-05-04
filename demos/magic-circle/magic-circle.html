@@ -17,6 +17,14 @@
 				frameRate(60);
 				background(255);
 				
+				// demo settings
+				let circleSize = 200;
+				let circleAppearDuration = 2000;
+				let originVector = createVector(width/2, height/2);
+				
+				// keep track of the newest added animation start time
+				let animationStart = 1000;
+				
 				// add a circle to draw
 				objects.push({
 					type: "circle",
@@ -24,15 +32,56 @@
 						prop: "endAngle",
 						first: 0,
 						last: TWO_PI,
-						duration: 2000, // milliseconds
-						progress: 0
+						duration: circleAppearDuration, // milliseconds
+						progress: 0,
+						delay: animationStart
 					}],
 					x: width / 2,
 					y: height / 2,
-					radius: 200,
+					radius: circleSize,
 					startAngle: 0,
 					endAngle: 0
 				})
+				
+				// add some lines that surround the circle
+				let numLines = 24;
+				let lineLength = 30;
+				for (let i = 0; i < numLines; i++) {
+					// decide where the initial and final point should be
+					// the initial point starts on the circle
+					// the outer point grows perpendicularly to the circle's tangent
+					
+					let innerPoint = p5.Vector.add(
+						originVector,
+						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(circleSize / 2)
+					);
+					let outerPoint = p5.Vector.add(
+						innerPoint,
+						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(lineLength)
+					);
+					
+					// add the line
+					objects.push({
+						type: "line",
+						animations: [{
+							prop: "p2",
+							first: innerPoint,
+							last: outerPoint,
+							delay: i / numLines * circleAppearDuration + animationStart,
+							duration: 200, // milliseconds,
+							progress: 0
+						}],
+						p1: innerPoint,
+						p2: innerPoint,
+						radius: 200,
+						startAngle: 0,
+						endAngle: 0
+					})
+				}
+			}
+			
+			function isVector(obj) {
+				return obj.hasOwnProperty("x") && obj.hasOwnProperty("y");
 			}
 			
 			function draw() { 
@@ -47,8 +96,20 @@
 					for (let j = 0; j < o.animations.length; j++) {
 						let anim = o.animations[j];
 
-						anim.progress = min(anim.progress + diff, anim.duration);
-						o[anim.prop] = lerp(anim.first, anim.last, anim.progress / anim.duration);
+						// add the current time to the progress of animation
+						anim.progress = min(anim.progress + diff, anim.duration + (anim.delay || 0));
+						// fix progress ratio between 0 and 1
+						let progressRatio = constrain((anim.progress - (anim.delay || 0)) / anim.duration, 0, 1);
+						
+						// update the actual property
+						if (isVector(o[anim.prop])) {
+							// is a vector, use vector lerp
+							o[anim.prop] = p5.Vector.lerp(anim.first, anim.last, progressRatio);	
+						} else {
+							// is scalar, use scalar lerp
+							o[anim.prop] = lerp(anim.first, anim.last, progressRatio);	
+						}
+						
 						// TODO how to remove animations that are done?
 					}
 				}
@@ -58,16 +119,16 @@
 					let o = objects[i];
 					// draw circle
 					if (o.type === "circle") {
-						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);	
+						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
 					} else if (o.type === "line") {
-						line(o.p1.x, o.p1.y, o.p2.x, o2.p2.y);
+						line(o.p1.x, o.p1.y, o.p2.x, o.p2.y);
 					}
 					
 				}
 			  
 				// limit the amount of time the animation runs
 				count++;
-				if (count > 200) {
+				if (count > 2000) {
 					noLoop();
 				}
 			}
