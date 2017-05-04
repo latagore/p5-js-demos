@@ -9,6 +9,7 @@
 		<script>
 			let objects = []; // objects to animate
 			let count = 0;
+		  	let time = 0, lastTime = 0;
 			function setup() {
 				createCanvas(720, 400);
 				stroke(0);
@@ -20,9 +21,12 @@
 				objects.push({
 					type: "circle",
 					animations: [{
-						type: "endAngle", // animates the end angle of the arc
-						finalAngle: TWO_PI,
-						step: PI * 0.01
+						prop: "endAngle",
+						first: 0,
+						last: TWO_PI,
+						step: PI * 0.01,
+						// lerpStep: 1/200,
+						progress: 0
 					}],
 					x: width / 2,
 					y: height / 2,
@@ -34,6 +38,8 @@
 			
 			function draw() { 
 				background(255);
+				lastTime = time;
+				time = millis();
 				for (let i = 0; i < objects.length; i++) {
 					let o = objects[i];
 					
@@ -42,24 +48,31 @@
 						// update circle properties
 						for (let j = 0; j < o.animations.length; j++) {
 							let anim = o.animations[j];
-							if (anim.type === "endAngle") {
-								o.endAngle += anim.step;
-								if (anim.step > 0    && o.endAngle > anim.finalAngle
-									|| anim.step < 0 && o.endAngle < anim.finalAngle) {
-									o.endAngle = anim.finalAngle;
-								}
+							
+							o[anim.prop] += anim.step;
+							if (anim.step > 0    && o[anim.prop] > anim.last
+								|| anim.step < 0 && o[anim.prop] < anim.last) {
+								o[anim.prop] = anim.last;
+							    // TODO how to remove animations that are done?
 							}
+							
+//							if (anim.type === "endAngle") {
+//								o.endAngle += anim.step;
+//								if (anim.step > 0    && o.endAngle > anim.finalAngle
+//									|| anim.step < 0 && o.endAngle < anim.finalAngle) {
+//									o.endAngle = anim.finalAngle;
+//								}
+//							}
 							
 						}
 						
 						// draw circle
 						console.log(o.startAngle, o.endAngle);
 						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
-						arc(o.x - 10, o.y - 10, o.radius, o.radius, 0, TWO_PI);
 					}
-					
 				}
 				
+			  // limit the amount of time the animation runs
 				count++;
 				if (count > 200) {
 					noLoop();
