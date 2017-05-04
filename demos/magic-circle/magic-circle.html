@@ -18,34 +18,21 @@
 				background(255);
 				
 				// demo settings
-				let circleSize = 200;
+				
 				let circleAppearDuration = 2000;
 				let originVector = createVector(width/2, height/2);
 				
-				// keep track of the newest added animation start time
+				// keep track of animations/objects being added
 				let animationStart = 1000;
+				let circleSize = 200;
 				
 				// add a circle to draw
-				objects.push({
-					type: "circle",
-					animations: [{
-						prop: "endAngle",
-						first: 0,
-						last: TWO_PI,
-						duration: circleAppearDuration, // milliseconds
-						progress: 0,
-						delay: animationStart
-					}],
-					x: width / 2,
-					y: height / 2,
-					radius: circleSize,
-					startAngle: 0,
-					endAngle: 0
-				})
+				addArcCircle(originVector, circleSize, 0, circleAppearDuration, animationStart);
 				
 				// add some lines that surround the circle
 				let numLines = 24;
 				let lineLength = 30;
+				
 				for (let i = 0; i < numLines; i++) {
 					// decide where the initial and final point should be
 					// the initial point starts on the circle
@@ -86,6 +73,33 @@
 						color: color(0, 0)
 					})
 				}
+				circleSize += lineLength;
+			}
+			
+			function addArcCircle(centerPoint, size, initialAngle, duration, delay) {
+				objects.push({
+					type: "circle",
+					animations: [{
+						prop: "endAngle",
+						first: initialAngle,
+						last: initialAngle + TWO_PI,
+						duration: duration, // milliseconds
+						progress: 0,
+						delay: delay
+					}, {
+						prop: "color",
+						first: color(0, 0), // black, no opacity
+						last: color(0, 255), // black, full opacity
+						duration: duration,
+						progress: 0,
+						delay: delay
+					}],
+					center: centerPoint,
+					color: color(0, 0),
+					radius: size,
+					startAngle: initialAngle,
+					endAngle: initialAngle
+				});
 			}
 			
 			function isVector(obj) {
@@ -139,7 +153,7 @@
 					
 					stroke(o.color || color(0));
 					if (o.type === "circle") {
-						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
+						arc(o.center.x, o.center.y, o.radius, o.radius, o.startAngle, o.endAngle);
 					} else if (o.type === "line") {
 						line(o.p1.x, o.p1.y, o.p2.x, o.p2.y);
 					}
