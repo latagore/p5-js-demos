@@ -24,8 +24,7 @@
 						prop: "endAngle",
 						first: 0,
 						last: TWO_PI,
-						step: PI * 0.01,
-						// lerpStep: 1/200,
+						duration: 2000, // milliseconds
 						progress: 0
 					}],
 					x: width / 2,
@@ -40,6 +39,8 @@
 				background(255);
 				lastTime = time;
 				time = millis();
+				let diff = time - lastTime;
+				console.log(diff);
 				for (let i = 0; i < objects.length; i++) {
 					let o = objects[i];
 					
@@ -49,29 +50,18 @@
 						for (let j = 0; j < o.animations.length; j++) {
 							let anim = o.animations[j];
 							
-							o[anim.prop] += anim.step;
-							if (anim.step > 0    && o[anim.prop] > anim.last
-								|| anim.step < 0 && o[anim.prop] < anim.last) {
-								o[anim.prop] = anim.last;
-							    // TODO how to remove animations that are done?
-							}
-							
-//							if (anim.type === "endAngle") {
-//								o.endAngle += anim.step;
-//								if (anim.step > 0    && o.endAngle > anim.finalAngle
-//									|| anim.step < 0 && o.endAngle < anim.finalAngle) {
-//									o.endAngle = anim.finalAngle;
-//								}
-//							}
-							
+							anim.progress = min(anim.progress + diff, anim.duration);
+							console.log(anim.progress);
+							o[anim.prop] = lerp(anim.first, anim.last, anim.progress / anim.duration);
+							// TODO how to remove animations that are done?
 						}
 						
 						// draw circle
-						console.log(o.startAngle, o.endAngle);
 						arc(o.x, o.y, o.radius, o.radius, o.startAngle, o.endAngle);
 					}
 				}
 				
+			  
 			  // limit the amount of time the animation runs
 				count++;
 				if (count > 200) {
