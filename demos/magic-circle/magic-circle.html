@@ -33,46 +33,7 @@
 				let numLines = 24;
 				let lineLength = 30;
 				
-				for (let i = 0; i < numLines; i++) {
-					// decide where the initial and final point should be
-					// the initial point starts on the circle
-					// the outer point grows perpendicularly to the circle's tangent
-					
-					let innerPoint = p5.Vector.add(
-						originVector,
-						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(circleSize / 2)
-					);
-					let outerPoint = p5.Vector.add(
-						innerPoint,
-						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(lineLength)
-					);
-					
-					// add the line
-					objects.push({
-						type: "line",
-						animations: [{
-							prop: "p2",
-							first: innerPoint,
-							last: outerPoint,
-							delay: i / numLines * circleAppearDuration + animationStart,
-							duration: 1000, // milliseconds,
-							progress: 0
-						}, {
-							prop: "color",
-							first: color(0, 255 * i / numLines), // black, opacity matching first circle
-							last: color(0, 255), // black, full opacity
-							duration: (numLines - i - 1) / numLines * circleAppearDuration,
-							progress: 0,
-							delay: i / numLines * circleAppearDuration + animationStart
-						}],
-						p1: innerPoint,
-						p2: innerPoint,
-						radius: 200,
-						startAngle: 0,
-						endAngle: 0,
-						color: color(0, 0)
-					})
-				}
+				addRadiatingLineCircle(originVector, circleSize / 2, numLines, lineLength, circleAppearDuration, animationStart);
 				circleSize += lineLength;
 			}
 			
@@ -100,6 +61,49 @@
 					startAngle: initialAngle,
 					endAngle: initialAngle
 				});
+			}
+			
+			function addRadiatingLineCircle(centerPoint, radius, numLines, lineLength, duration, delay) {
+				for (let i = 0; i < numLines; i++) {
+					// decide where the initial and final point should be
+					// the initial point starts on the circle
+					// the outer point grows perpendicularly to the circle's tangent
+					
+					let innerPoint = p5.Vector.add(
+						centerPoint,
+						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(radius)
+					);
+					let outerPoint = p5.Vector.add(
+						innerPoint,
+						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(lineLength)
+					);
+					
+					// add the line
+					objects.push({
+						type: "line",
+						animations: [{
+							prop: "p2",
+							first: innerPoint,
+							last: outerPoint,
+							delay: i / numLines * duration + delay,
+							duration: 1000, // milliseconds,
+							progress: 0
+						}, {
+							prop: "color",
+							first: color(0, 255 * i / numLines), // black, opacity matching first circle
+							last: color(0, 255), // black, full opacity
+							duration: (numLines - i - 1) / numLines * duration,
+							progress: 0,
+							delay: i / numLines * duration + delay
+						}],
+						p1: innerPoint,
+						p2: innerPoint,
+						radius: 200,
+						startAngle: 0,
+						endAngle: 0,
+						color: color(0, 0)
+					})
+				}
 			}
 			
 			function isVector(obj) {
