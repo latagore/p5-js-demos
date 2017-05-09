@@ -35,6 +35,8 @@
 				
 				addRadiatingLineCircle(originVector, circleSize / 2, numLines, lineLength, circleAppearDuration, animationStart);
 				circleSize += lineLength;
+				
+				
 			}
 			
 			function addArcCircle(centerPoint, size, initialAngle, duration, delay) {
@@ -78,32 +80,48 @@
 						p5.Vector.fromAngle(TWO_PI * i / numLines).setMag(lineLength)
 					);
 					
-					// add the line
-					objects.push({
-						type: "line",
-						animations: [{
-							prop: "p2",
-							first: innerPoint,
-							last: outerPoint,
-							delay: i / numLines * duration + delay,
-							duration: 1000, // milliseconds,
-							progress: 0
-						}, {
+					addConnectingLine(
+						innerPoint, 
+						outerPoint,
+						1000,
+						i / numLines * duration + delay,
+						[{
 							prop: "color",
 							first: color(0, 255 * i / numLines), // black, opacity matching first circle
 							last: color(0, 255), // black, full opacity
 							duration: (numLines - i - 1) / numLines * duration,
 							progress: 0,
 							delay: i / numLines * duration + delay
-						}],
-						p1: innerPoint,
-						p2: innerPoint,
-						radius: 200,
-						startAngle: 0,
-						endAngle: 0,
-						color: color(0, 0)
-					})
+						}]
+					);
 				}
+			}
+			
+			function addConnectingLine(initialPoint, finalPoint, duration, delay, animations) {
+				
+				let a = [{
+					prop: "p2",
+					first: initialPoint,
+					last: finalPoint,
+					delay: delay,
+					duration: duration, // milliseconds,
+					progress: 0
+				}];
+				
+				for (let i = 0; i < animations.length; i++) {
+					a.push(animations[i]);
+				}
+				
+				objects.push({
+					type: "line",
+					animations: a,
+					p1: initialPoint,
+					p2: initialPoint,
+					radius: 200,
+					startAngle: 0,
+					endAngle: 0,
+					color: color(0, 0)
+				})
 			}
 			
 			function isVector(obj) {
