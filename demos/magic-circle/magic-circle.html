@@ -40,7 +40,7 @@
 				)
 				
 				// add some lines that surround the circle
-				let numLines = 24;
+				let numLines = 20;
 				let lineLength = 30;
 				
 				objects.push(
@@ -53,7 +53,18 @@
 						delay: animationStart
 					})
 				);
-				circleSize += lineLength;
+				animationStart += circleAppearDuration * 2
+				
+				objects.push(
+					new DrawingStar({
+						center: originVector,
+						radius: circleSize / 2,
+						numPoints: 5,
+						color: BLACK,
+						duration: 1500,
+						delay: animationStart
+					})
+				);
 				
 				
 			}
@@ -221,6 +232,72 @@
 				}
 			}
 			
+			class DrawingStar extends Animatable {
+				constructor(props) {
+					super(props);
+					let defaults = {
+						animations: [],
+						lines: [],
+						color: color(0, 0)
+					};
+					
+					// copy properties from `props` and use defaults where they are missing
+					let that = Object.assign(defaults, props);
+						
+					// assign properties to `this`
+					for (let prop in that) {
+						this[prop] = that[prop];
+					}
+					
+					// add each line animation one by one
+					let n = 0; // number of lines drawn so far
+					let currentVertex = 0; // current vertex
+					while (n < this.numPoints) {
+						let nextVertex = (currentVertex + Math.floor(this.numPoints / 2)) % this.numPoints;
+						
+						let p_i = p5.Vector.add(
+							this.center,
+							p5.Vector.fromAngle(TWO_PI * currentVertex / this.numPoints).setMag(this.radius)
+						);
+						let p_next = p5.Vector.add(
+							this.center,
+							p5.Vector.fromAngle(TWO_PI * nextVertex / this.numPoints).setMag(this.radius)
+						);
+
+						// add line
+						let l = new Line({
+							p1: p_i, 
+							p2: p_i,
+							color: this.color
+						}).animate(
+							"p2",
+							p_i,
+							p_next,
+							this.duration / this.numPoints,
+							this.delay + n * this.duration / this.numPoints
+						);
+						this.lines.push(l);
+						
+						currentVertex = nextVertex;
+						n++;
+					}
+				}
+				
+				next(time) {
+					super.next(time);
+					for (let i = 0; i < this.lines.length; i++) {
+						this.lines[i].next(time);
+					}
+				}
+				
+				draw() {
+					stroke(this.color);
+					for (let i = 0; i < this.lines.length; i++) {
+						this.lines[i].draw();
+					}
+				}
+			}
+			
 			function isVector(obj) {
 				return obj.hasOwnProperty("x") && obj.hasOwnProperty("y");
 			}
@@ -247,8 +324,9 @@
 			  
 				// limit the amount of time the animation runs
 				count++;
-				if (count > 300) {
+				if (count > 2000) {
 					noLoop();
+					console.log("finished animation");
 				}
 			}
 			
