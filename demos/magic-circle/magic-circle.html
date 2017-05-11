@@ -31,7 +31,7 @@
 				objects.push(
 					new Arc({
 						center: originVector,
-						radius: circleSize,
+						radius: circleSize / 2,
 						startAngle: 0,
 						endAngle: 0,
 						color: TRANSPARENT
@@ -134,7 +134,7 @@
 			
 				draw() {
 					stroke(this.color);
-					arc(this.center.x, this.center.y, this.radius, this.radius, this.startAngle, this.endAngle);
+					arc(this.center.x, this.center.y, this.radius * 2, this.radius * 2, this.startAngle, this.endAngle);
 				}
 			}
 			
