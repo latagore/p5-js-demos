@@ -33,8 +33,7 @@
 						center: originVector,
 						radius: circleSize / 2,
 						startAngle: 0,
-						endAngle: 0,
-						color: TRANSPARENT
+						endAngle: 0
 					}).animate("color", TRANSPARENT, BLACK, circleAppearDuration, animationStart)
 						 .animate("endAngle", 0, TWO_PI, circleAppearDuration, animationStart)
 				)
@@ -49,6 +48,7 @@
 						radius: circleSize / 2,
 						numLines: numLines,
 						lineLength: lineLength,
+						color: TRANSPARENT,
 						duration: circleAppearDuration,
 						delay: animationStart
 					})
@@ -70,6 +70,10 @@
 			}
 			
 			class Animatable {
+				constructor() {
+					this.animations = [];
+				}
+				
 				animate(propName, first, last, duration, delay) {
 					// TODO error checking
 					this.animations.push({
@@ -117,18 +121,11 @@
 			class Arc extends Animatable {
 				constructor(props) {
 					super(props);
-					let defaults = {
-						type: "circle",
-						animations: [],
-						color: color(0, 0)
-					};
+					this.color = color(9, 0);
 					
-					// copy properties from `props` and use defaults where they are missing
-					let that = Object.assign(defaults, props);
-						
 					// assign properties to `this`
-					for (let prop in that) {
-						this[prop] = that[prop];
+					for (let prop in props) {
+						this[prop] = props[prop];
 					}
 				}
 			
@@ -141,18 +138,11 @@
 			class Line extends Animatable {
 				constructor(props) {
 					super(props);
-					let defaults = {
-						type: "line",
-						animations: [],
-						color: color(0, 0)
-					};
+					this.color = color(9, 0);
 					
-					// copy properties from `props` and use defaults where they are missing
-					let that = Object.assign(defaults, props);
-						
 					// assign properties to `this`
-					for (let prop in that) {
-						this[prop] = that[prop];
+					for (let prop in props) {
+						this[prop] = props[prop];
 					}
 				}
 				
@@ -170,19 +160,12 @@
 				// TODO document valid properties
 				constructor(props) {
 					super(props);
-					let defaults = {
-						type: "line",
-						animations: [],
-						lines: [],
-						color: color(0, 0)
-					};
+					this.color = color(9, 0);
+					this.lines = [];
 					
-					// copy properties from `props` and use defaults where they are missing
-					let that = Object.assign(defaults, props);
-						
 					// assign properties to `this`
-					for (let prop in that) {
-						this[prop] = that[prop];
+					for (let prop in props) {
+						this[prop] = props[prop];
 					}
 					
 					// initialize lines
@@ -235,18 +218,12 @@
 			class DrawingStar extends Animatable {
 				constructor(props) {
 					super(props);
-					let defaults = {
-						animations: [],
-						lines: [],
-						color: color(0, 0)
-					};
+					this.color = color(9, 0);
+					this.lines = [];
 					
-					// copy properties from `props` and use defaults where they are missing
-					let that = Object.assign(defaults, props);
-						
 					// assign properties to `this`
-					for (let prop in that) {
-						this[prop] = that[prop];
+					for (let prop in props) {
+						this[prop] = props[prop];
 					}
 					
 					// add each line animation one by one
