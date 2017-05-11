@@ -41,28 +41,31 @@
 				// add some lines that surround the circle
 				let numLines = 20;
 				let lineLength = 30;
+				let extendDuration = 700;
 				
 				objects.push(
-					new RadiatingLineCircle({
+					new RadiatingLineArc({
 						center: originVector,
 						radius: circleSize / 2,
 						numLines: numLines,
 						lineLength: lineLength,
 						color: TRANSPARENT,
 						circleDuration: circleAppearDuration,
-						extendDuration: 1000,
+						extendDuration: extendDuration,
 						delay: animationStart
 					})
 				);
-				animationStart += circleAppearDuration * 2
+				animationStart += circleAppearDuration + extendDuration;
 				
+				
+				let starDuration = 1000;
 				objects.push(
 					new DrawingStar({
 						center: originVector,
 						radius: circleSize / 2,
 						numPoints: 5,
 						color: BLACK,
-						duration: 1500,
+						duration: starDuration,
 						delay: animationStart
 					})
 				);
@@ -157,12 +160,14 @@
 				}
 			}
 			
-			class RadiatingLineCircle extends Animatable {
+			class RadiatingLineArc extends Animatable {
 				// TODO document valid properties
 				constructor(props) {
 					super(props);
 					this.color = color(9, 0);
 					this.lines = [];
+					this.startAngle = 0;
+					this.endAngle = TWO_PI;
 					
 					// assign properties to `this`
 					for (let prop in props) {
@@ -177,11 +182,11 @@
 
 						let innerPoint = p5.Vector.add(
 							this.center,
-							p5.Vector.fromAngle(TWO_PI * i / this.numLines).setMag(this.radius)
+							p5.Vector.fromAngle((this.endAngle - this.startAngle) * i / this.numLines).setMag(this.radius)
 						);
 						let outerPoint = p5.Vector.add(
 							innerPoint,
-							p5.Vector.fromAngle(TWO_PI * i / this.numLines).setMag(this.lineLength)
+							p5.Vector.fromAngle((this.endAngle - this.startAngle) * i / this.numLines).setMag(this.lineLength)
 						);
 
 						// add line
