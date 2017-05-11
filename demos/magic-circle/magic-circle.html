@@ -49,7 +49,8 @@
 						numLines: numLines,
 						lineLength: lineLength,
 						color: TRANSPARENT,
-						duration: circleAppearDuration,
+						circleDuration: circleAppearDuration,
+						extendDuration: 1000,
 						delay: animationStart
 					})
 				);
@@ -186,16 +187,20 @@
 						// add line
 						let l = new Line({
 							p1: innerPoint, 
-							p2: innerPoint,
-							duration: 1000,
-							delay: i / this.numLines * this.duration + this.delay
+							p2: innerPoint
 						}).animate(
 							"color", 
 						   color(0, 255 * i / this.numLines), 
 						   color(0, 255), 
-						   (this.numLines - i - 1) / this.numLines * this.duration, 
-						   i / this.numLines * this.duration + this.delay
-						).animate("p2", innerPoint, outerPoint, this.duration, i / this.numLines * this.duration + this.delay);
+						   (this.numLines - i - 1) / this.numLines * this.circleDuration, 
+						   i / this.numLines * this.circleDuration + this.delay
+						).animate(
+							"p2", 
+							innerPoint,
+							outerPoint,
+							this.extendDuration,
+							i / this.numLines * this.circleDuration + this.delay
+						);
 						this.lines.push(l);
 					}
 				}
