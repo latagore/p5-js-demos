@@ -78,15 +78,20 @@
 					this.animations = [];
 				}
 				
-				animate(propName, first, last, duration, delay) {
+				animate(propName, first, last, duration, delay, interpolationFn) {
 					// TODO error checking
+					if (interpolationFn && !isFunction(interpolationFn)) {
+						throw new Error("interpolationFn is not a function");
+					}
+					
 					this.animations.push({
 						prop: propName,
 						first: first, // black, no opacity
 						last: last, // black, full opacity
-						duration: duration || 1000,
+						duration: duration != null ? duration : 1000,
 						delay: delay || 0,
-						progress: 0
+						progress: 0,
+						interpolationFn: interpolationFn
 					});
 					return this;
 				}
@@ -95,7 +100,8 @@
 				next(time) {
 					for (let j = 0; j < this.animations.length; j++) {
 						let anim = this.animations[j];
-
+						let interpolationFn;
+						
 						// add the current time to the progress of animation
 						anim.progress = min(anim.progress + time, anim.duration + (anim.delay || 0));
 						// fix progress ratio between 0 and 1
@@ -107,15 +113,23 @@
 							continue;
 						}
 						
-						if (isVector(this[anim.prop])) {
-							// is a vector, use vector lerp
-							this[anim.prop] = p5.Vector.lerp(anim.first, anim.last, progressRatio);	
-						} else if (isColor(this[anim.prop])) {
-							this[anim.prop] = lerpColor(anim.first, anim.last, progressRatio);	
+						// figure out which interpolation function to use
+						if (anim.interpolationFn){
+							interpolationFn = anim.interpolationFn;
 						} else {
-							// is scalar, use scalar lerp
-							this[anim.prop] = lerp(anim.first, anim.last, progressRatio);	
+							// default to linear interpolation
+							if (isVector(this[anim.prop])) {
+								interpolationFn = p5.Vector.lerp;
+							} else if (isColor(this[anim.prop])) {
+								interpolationFn = lerpColor;
+							} else {
+								// is scalar, use scalar lerp
+								interpolationFn = lerp;
+							}
 						}
+
+						// update the actual property
+						this[anim.prop] = interpolationFn(anim.first, anim.last, progressRatio);
 						
 						// TODO how to remove animations that are done?
 					}
@@ -164,7 +178,7 @@
 				// TODO document valid properties
 				constructor(props) {
 					super(props);
-					this.color = color(9, 0);
+					this.color = color(0, 0);
 					this.lines = [];
 					this.startAngle = 0;
 					this.endAngle = TWO_PI;
@@ -291,6 +305,10 @@
 			
 			function isColor(obj) {
 				return obj instanceof p5.Color;
+			}
+			
+			function isFunction(obj) {
+				return typeof obj === "function";
 			}
 			
 			function draw() { 
