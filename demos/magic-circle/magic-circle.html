@@ -160,7 +160,11 @@
 			
 				draw() {
 					stroke(this.color);
-					arc(this.center.x, this.center.y, this.radius * 2, this.radius * 2, this.startAngle, this.endAngle);
+					if (Math.abs(this.startAngle - this.endAngle) < TWO_PI) {
+						arc(this.center.x, this.center.y, this.radius * 2, this.radius * 2, this.startAngle, this.endAngle);
+					} else {
+						ellipse(this.center.x, this.center.y, this.radius * 2, this.radius * 2);
+					}
 				}
 			}
 			
