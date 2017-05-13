@@ -70,6 +70,17 @@
 					})
 				);
 				
+				objects.push(
+					new RadiatingLineArc2({
+						center: originVector,
+						radius: circleSize / 2 + 20,
+						numLines: numLines * 3,
+						lineLength: 10,
+						color: BLACK,
+						duration: 2000,
+						delay: animationStart
+					})
+				);
 				
 			}
 			
@@ -220,6 +231,99 @@
 							this.extendDuration,
 							i / this.numLines * this.circleDuration + this.delay
 						);
+						this.lines.push(l);
+					}
+				}
+				
+				next(time) {
+					super.next(time);
+					for (let i = 0; i < this.lines.length; i++) {
+						this.lines[i].next(time);
+					}
+				}
+				
+				draw() {
+					stroke(this.color);
+					for (let i = 0; i < this.lines.length; i++) {
+						this.lines[i].draw();
+					}
+				}
+			}
+			
+			class RadiatingLineArc2 extends Animatable {
+				// TODO document valid properties
+				constructor(props) {
+					super(props);
+					this.color = color(0, 0);
+					this.lines = [];
+					this.startAngle = 0;
+					this.endAngle = TWO_PI;
+					
+					// assign properties to `this`
+					for (let prop in props) {
+						this[prop] = props[prop];
+					}
+					
+					let innerInterpolationFn = function(start, end, ratio) {
+						// start and end doesn't matter here because of closure
+						let angle = lerp(this.startAngle, this.endAngle, ratio);
+						return p5.Vector.add(
+							this.center,
+							p5.Vector.fromAngle(angle).setMag(this.radius)
+						);
+					}.bind(this);
+					let outerInterpolationFn = function(start, end, ratio) {
+						// start and end doesn't matter here because of closure
+						let angle = lerp(this.startAngle, this.endAngle, ratio);
+						return p5.Vector.add(
+							this.center,
+							p5.Vector.fromAngle(angle).setMag(this.radius + this.lineLength)
+						);
+					}.bind(this);
+					
+					// initialize arcing line, don't need a start or end, leave as undefined
+					let p1 = innerInterpolationFn(undefined, undefined, 0);
+					let p2 = outerInterpolationFn(undefined, undefined, 0);
+					let l = new Line({
+						p1: p1, 
+						p2: p1,
+						color: this.color
+					}).animate(
+						"p1", 
+						p1,
+						p1,
+						this.duration,
+						this.delay,
+						innerInterpolationFn
+					).animate(
+						"p2", 
+						p2,
+						p2,
+						this.duration,
+						this.delay,
+						outerInterpolationFn
+					);
+					this.lines.push(l);
+					// initialize lines
+					for (let i = 0; i < this.numLines; i++) {
+						// decide where the initial and final point should be
+						// the initial point starts on the circle
+						// the outer point grows perpendicularly to the circle's tangent
+
+						let innerPoint = innerInterpolationFn(undefined, undefined, i / this.numLines);
+						let outerPoint = outerInterpolationFn(undefined, undefined, i / this.numLines);
+
+						// add line
+						let l = new Line({
+							p1: innerPoint, 
+							p2: outerPoint
+						}).animate(
+							"color", 
+						   color(0, 0), 
+						   this.color, 
+						   0, 
+						   i / this.numLines * this.duration + this.delay
+						)
 						this.lines.push(l);
 					}
 				}
