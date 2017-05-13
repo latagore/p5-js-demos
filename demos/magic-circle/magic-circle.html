@@ -20,7 +20,7 @@
 				// demo settings
 				const TRANSPARENT = color(0, 0);
 				const BLACK = color(0, 255);
-				let circleAppearDuration = 2000;
+				let circleAppearDuration = 1000;
 				let fadeInDuration = 500;
 				let originVector = createVector(width/2, height/2);
 				
@@ -109,6 +109,32 @@
 					)
 					
 					randomCircleSize += Math.random() * 20 + 5;
+				}
+				
+				
+				// create fans
+				let numFans = numLines / 2;
+				for (let i = 0; i < numFans; i++) {
+					let start = p5.Vector.add(
+						originVector,
+						p5.Vector.fromAngle(i / numFans * TWO_PI).setMag(circleSize / 2)
+					);
+					let end = p5.Vector.add(
+						originVector,
+						p5.Vector.fromAngle(i / numFans * TWO_PI).setMag(circleSize / 2 + lineLength)
+					);
+					
+					objects.push(
+						new FanTriangle({
+							p1: end,
+							p2: start,
+							width: 30,
+							color: BLACK,
+							numLines: 6,
+							duration: 700,
+							delay: animationStart
+						})
+					)
 				}
 				
 				
@@ -380,7 +406,7 @@
 			class DrawingStar extends Animatable {
 				constructor(props) {
 					super(props);
-					this.color = color(9, 0);
+					this.color = color(0, 0);
 					this.lines = [];
 					
 					// assign properties to `this`
@@ -419,6 +445,92 @@
 						
 						currentVertex = nextVertex;
 						n++;
+					}
+				}
+				
+				next(time) {
+					super.next(time);
+					for (let i = 0; i < this.lines.length; i++) {
+						this.lines[i].next(time);
+					}
+				}
+				
+				draw() {
+					stroke(this.color);
+					for (let i = 0; i < this.lines.length; i++) {
+						this.lines[i].draw();
+					}
+				}
+			}
+			
+			class FanTriangle extends Animatable {
+				// required properties
+				// width: width of the fan in pixels
+				// p1: tip of the fan
+				// p2: end of the fan
+				// numLines: number of lines in the fan
+				
+				// optional
+				// color
+				constructor(props) {
+					super(props);
+					this.color = color(0, 0);
+					this.lines = [];
+					
+					// assign properties to `this`
+					for (let prop in props) {
+						this[prop] = props[prop];
+					}
+					
+					// find a vector perpendicular to p1p2
+					let p1p2 = p5.Vector.sub(this.p2, this.p1);
+					let perpVector = createVector(0, 0);
+					perpVector.x = p1p2.y;
+					perpVector.y = -p1p2.x;
+					perpVector = perpVector.setMag(this.width / 2);
+					// the points for the base or "bottom" of the triangle
+					let bottomLeftPoint = p5.Vector.add(this.p2, perpVector);
+					let bottomRightPoint = p5.Vector.add(this.p2, perpVector.mult(-1));
+					
+					for (let i = 0; i < this.numLines / 2; i++) {
+						let finalLeftPoint = p5.Vector.lerp(this.p1, bottomLeftPoint, (i + 1) / this.numLines);
+						let finalRightPoint = p5.Vector.lerp(this.p1, bottomRightPoint, (i + 1) / this.numLines);
+						
+						// add line
+						let leftLine = new Line({
+							p1: this.p1, 
+							p2: this.p2
+						}).animate(
+							"p1",
+							this.p1,
+							finalLeftPoint,
+							this.duration,
+							this.delay
+						).animate(
+							"color",
+							color(0, 0),
+							this.color,
+							0,
+							this.delay
+						);
+						let rightLine = new Line({
+							p1: this.p1, 
+							p2: this.p2
+						}).animate(
+							"p1",
+							this.p1,
+							finalRightPoint,
+							this.duration,
+							this.delay
+						).animate(
+							"color",
+							color(0, 0),
+							this.color,
+							0,
+							this.delay
+						);
+						this.lines.push(leftLine);
+						this.lines.push(rightLine);
 					}
 				}
 				
